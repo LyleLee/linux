@@ -22,6 +22,7 @@
  * _interruptible, _interruptible_timeout, and _killable), init_completion(),
  * reinit_completion(), and macros DECLARE_COMPLETION(),
  * DECLARE_COMPLETION_ONSTACK().
+ * 使用一个先进先出队列实现completion事件
  */
 struct completion {
 	unsigned int done;
@@ -49,6 +50,7 @@ static inline void complete_release(struct completion *x) {}
  * This macro declares and initializes a completion structure. Generally used
  * for static declarations. You should use the _ONSTACK variant for automatic
  * variables.
+ * 静态声明completion
  */
 #define DECLARE_COMPLETION(work) \
 	struct completion work = COMPLETION_INITIALIZER(work)
@@ -81,6 +83,7 @@ static inline void complete_release(struct completion *x) {}
  *
  * This inline function will initialize a dynamically created completion
  * structure.
+ * 动态初始化completion
  */
 static inline void __init_completion(struct completion *x)
 {
@@ -99,7 +102,7 @@ static inline void reinit_completion(struct completion *x)
 {
 	x->done = 0;
 }
-
+// wait_for_completion() 执行不可打断等待，如果你的代码调用wait_for_completion 并且没有人完成这个任务, 结果会是一个不可杀死的进程。
 extern void wait_for_completion(struct completion *);
 extern void wait_for_completion_io(struct completion *);
 extern int wait_for_completion_interruptible(struct completion *x);
@@ -114,8 +117,9 @@ extern long wait_for_completion_killable_timeout(
 	struct completion *x, unsigned long timeout);
 extern bool try_wait_for_completion(struct completion *x);
 extern bool completion_done(struct completion *x);
-
+// 发出完成事件，唤醒一个线程
 extern void complete(struct completion *);
+// 发出完成事件，如果有多个线程在等待，唤醒所有线程。如果只有一个线程在等待，那么和complete效果一样。
 extern void complete_all(struct completion *);
 
 #endif
