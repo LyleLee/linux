@@ -123,38 +123,45 @@ static inline int rwsem_is_contended(struct rw_semaphore *sem)
 
 /*
  * lock for reading
+ * 申请读锁，不成功会等待
  */
 extern void down_read(struct rw_semaphore *sem);
 extern int __must_check down_read_killable(struct rw_semaphore *sem);
 
 /*
  * trylock for reading -- returns 1 if successful, 0 if contention
+ * 申请读锁，如果有存在竞争则马上返回，不等待
  */
 extern int down_read_trylock(struct rw_semaphore *sem);
 
 /*
  * lock for writing
+ * 申请写锁，不成功会等待
  */
 extern void down_write(struct rw_semaphore *sem);
 extern int __must_check down_write_killable(struct rw_semaphore *sem);
 
 /*
  * trylock for writing -- returns 1 if successful, 0 if contention
+ * 申请写锁，不成功也会直接返回，不等待
  */
 extern int down_write_trylock(struct rw_semaphore *sem);
 
 /*
  * release a read lock
+ * 释放读锁
  */
 extern void up_read(struct rw_semaphore *sem);
 
 /*
  * release a write lock
+ * 释放写锁
  */
 extern void up_write(struct rw_semaphore *sem);
 
 /*
  * downgrade write lock to read lock
+ * 当前持有写锁，降级变成读者锁，用于写完成后立即允许读者进入
  */
 extern void downgrade_write(struct rw_semaphore *sem);
 
